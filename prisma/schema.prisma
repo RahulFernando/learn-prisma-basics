@@ -14,14 +14,15 @@ datasource db {
 }
 
 model users {
-  id              String            @id @default(uuid())
-  name            String
-  age             Int
-  email           String            @unique
-  isAdmin         Boolean
-  writtenPosts    posts[]           @relation("writtenPosts")
-  favouredPosts   posts[]           @relation("favouredPosts")
-  userPreferences user_preferences?
+  id               String            @id @default(uuid())
+  name             String
+  age              Int
+  email            String            @unique
+  role             Role              @default(BASIC)
+  writtenPosts     posts[]           @relation("writtenPosts")
+  favouredPosts    posts[]           @relation("favouredPosts")
+  userPreference   user_preferences? @relation(fields: [userPreferenceId], references: [id])
+  userPreferenceId String?           @unique
 
   @@index([email])
 }
@@ -29,8 +30,8 @@ model users {
 model user_preferences {
   id           String   @id @default(uuid())
   emailUpdates Boolean
-  user         users    @relation(fields: [usersId], references: [id])
-  usersId      String   @unique
+  user         users?
+  usersId      String?  @unique
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
@@ -53,4 +54,9 @@ model categories {
   id    String  @id @default(uuid())
   name  String  @unique
   posts posts[]
+}
+
+enum Role {
+  BASIC
+  ADMIN
 }
